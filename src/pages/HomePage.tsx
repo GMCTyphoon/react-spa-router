@@ -1,61 +1,26 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  setProducts,
-  setLoading,
-  setError,
-} from '../features/products/productsSlice';
+import { useSelector } from 'react-redux';
 import { RootState } from '../app/store';
-import ProductList from '../components/ProductList';
+import ProductsList from '../components/Products/ProductsList';
 import SearchAndFilter from '../components/SearchAndFilter';
 import { Product } from '../features/products/productsTypes';
+import { useFetchProducts } from '../hooks/useFetchProducts';
+import { useEffect, useState } from 'react';
 
 function HomePage() {
-  const dispatch = useDispatch();
   const {
     items: allProducts,
     loading,
     error,
   } = useSelector((state: RootState) => state.products);
 
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(allProducts);
 
-  // Загрузка данных
+  // Используем кастомный хук для загрузки данных
+  useFetchProducts();
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      dispatch(setLoading(true));
-
-      try {
-        const response = await fetch('https://fakestoreapi.com/products');
-        if (!response.ok) {
-          throw new Error('Не удалось загрузить товары');
-        }
-
-        const data = await response.json();
-
-        const formattedProducts: Product[] = data.map((product: Product) => ({
-          id: product.id.toString(),
-          title: product.title,
-          price: product.price,
-          description: product.description,
-          image: product.image,
-          category: product.category,
-        }));
-
-        dispatch(setProducts(formattedProducts));
-        setFilteredProducts(formattedProducts); 
-      } catch (err) {
-        console.error('Ошибка при загрузке товаров:', err);
-        dispatch(
-          setError('Ошибка при загрузке товаров. Пожалуйста, попробуйте снова.')
-        );
-      } finally {
-        dispatch(setLoading(false));
-      }
-    };
-
-    fetchProducts();
-  }, [dispatch]);
+    setFilteredProducts(allProducts);
+  }, [allProducts]);
 
   if (loading) {
     return <div className="text-center py-4">Загрузка...</div>;
@@ -77,7 +42,7 @@ function HomePage() {
 
       {/* Список товаров или сообщение, если товары не найдены */}
       {filteredProducts.length > 0 ? (
-        <ProductList products={filteredProducts} />
+        <ProductsList products={filteredProducts} />
       ) : (
         <div className="text-center text-gray-600">
           <svg

@@ -10,6 +10,7 @@ function CartPage() {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Корзина</h1>
 
+      {/* Корзина со списком продуктов */}
       {items.length === 0 ? (
         <p className="text-center text-gray-600">Ваша корзина пуста.</p>
       ) : (
@@ -19,7 +20,7 @@ function CartPage() {
               <CartItem key={item.id} item={item} />
             ))}
           </ul>
-
+          {/* Общая стоимость */}
           <CartSummary totalAmount={totalAmount} />
         </>
       )}
